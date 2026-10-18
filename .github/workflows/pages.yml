@@ -1,0 +1,81 @@
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore Creator
+        run: dotnet restore creator/project/Zunepedia.Creator.csproj
+
+      - name: Publish Creator
+        run: dotnet publish creator/project/Zunepedia.Creator.csproj --configuration Release --no-restore --output artifacts/creator
+
+      - name: Configure GitHub Pages base path
+        shell: pwsh
+        run: |
+          $wwwroot = "artifacts/creator/wwwroot"
+          Copy-Item "$wwwroot/index.html" "$wwwroot/404.html" -Force
+          foreach ($file in @("$wwwroot/index.html", "$wwwroot/404.html")) {
+            $content = Get-Content $file -Raw
+            $content = [regex]::Replace($content, '<base\s+href="[^"]*"\s*/?>', '<base href="/creator/" />', 1)
+            Set-Content $file $content -NoNewline
+          }
+
+      - name: Stage site
+        shell: bash
+        run: |
+          mkdir -p artifacts/site
+          rsync -av \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='creator/' \
+            --exclude='artifacts/' \
+            ./ artifacts/site/
+
+      - name: Add Creator app
+        shell: pwsh
+        run: |
+          $site = "artifacts/site"
+          $creator = "$site/creator"
+          New-Item $creator -ItemType Directory -Force | Out-Null
+          Copy-Item "artifacts/creator/wwwroot/*" $creator -Recurse -Force
+          New-Item "$site/.nojekyll" -ItemType File -Force | Out-Null
+          New-Item "$creator/.nojekyll" -ItemType File -Force | Out-Null
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: artifacts/site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
