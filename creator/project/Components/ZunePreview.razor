@@ -1,0 +1,17 @@
+@using Zunepedia.Creator.Models
+@using Zunepedia.Creator.Services
+
+<span class="zune-preview zune-preview-@Type.ToString().ToLowerInvariant()">
+    @((MarkupString)ZuneSvgRenderer.Render(Type, Color, Scale))
+</span>
+
+@code {
+    [Parameter]
+    public ZuneType Type { get; set; }
+
+    [Parameter]
+    public string Color { get; set; } = "#443016";
+
+    [Parameter]
+    public double Scale { get; set; } = 12;
+}
