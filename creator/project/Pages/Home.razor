@@ -1,0 +1,85 @@
+﻿@page "/"
+@inject ZuneCatalog Catalog
+
+<PageTitle>Zunepedia - Creator</PageTitle>
+
+<section class="zune-shell">
+    <div class="zune-card zune-controls" aria-label="Zune selection">
+        <fieldset aria-label="Device">
+            <div class="device-options">
+                @foreach (var device in Catalog.Devices)
+                {
+                    <button type="button"
+                            class="device-option @(device.Type == SelectedType ? "selected" : null)"
+                            aria-pressed="@(device.Type == SelectedType)"
+                            @onclick="() => SelectDevice(device.Type)">
+                        <span class="device-thumb" aria-hidden="true">
+                            <ZunePreview Type="@device.Type" Color="@device.DefaultColor" Scale="3" />
+                        </span>
+                        <span>@device.Name (@device.CodeName)</span>
+                    </button>
+                }
+            </div>
+        </fieldset>
+
+        <fieldset aria-label="Colour">
+            <div class="style-options">
+                @foreach (var style in AvailableStyles)
+                {
+                    <button type="button"
+                            class="style-option @(style.Name == SelectedStyle.Name ? "selected" : null)"
+                            aria-pressed="@(style.Name == SelectedStyle.Name)"
+                            @onclick="() => SelectStyle(style.Name)">
+                        <span class="style-swatch" style="background-color: @style.Color" aria-hidden="true"></span>
+                        <span>@style.Name</span>
+                    </button>
+                }
+            </div>
+        </fieldset>
+    </div>
+
+    <div class="zune-card zune-display">
+        <div class="zune-stage">
+            <ZunePreview Type="@SelectedType" Color="@SelectedStyle.Color" Scale="24" />
+        </div>
+        <a class="btn btn-primary zune-save position-relative" download="@FileName" href="@SvgDataUri">
+            <span>Save @SelectedStyle.Name @SelectedDevice.Name (@SelectedDevice.CodeName)</span>
+            <span class="zune-save-badge position-absolute top-100 start-50 translate-middle badge bg-dark rounded-pill">SVG</span>
+        </a>
+    </div>
+</section>
+
+@code {
+    private ZuneType SelectedType { get; set; } = ZuneType.Keel;
+
+    private string SelectedStyleName { get; set; } = "Brown";
+
+    private ZuneDevice SelectedDevice =>
+        Catalog.Devices.Single(device => device.Type == SelectedType);
+
+    private IReadOnlyList<ZuneStyle> AvailableStyles =>
+        Catalog.GetStyles(SelectedType).ToList();
+
+    private ZuneStyle SelectedStyle =>
+        AvailableStyles.FirstOrDefault(style => style.Name == SelectedStyleName) ?? AvailableStyles[0];
+
+    private string SvgMarkup =>
+        ZuneSvgRenderer.Render(SelectedType, SelectedStyle.Color, scale: 24);
+
+    private string SvgDataUri =>
+        $"data:image/svg+xml;charset=utf-8,{Uri.EscapeDataString(SvgMarkup)}";
+
+    private string FileName =>
+        $"{SelectedStyle.Name}-{SelectedDevice.CodeName}.svg".Replace(' ', '-').ToLowerInvariant();
+
+    private void SelectDevice(ZuneType type)
+    {
+        SelectedType = type;
+        SelectedStyleName = AvailableStyles[0].Name;
+    }
+
+    private void SelectStyle(string name)
+    {
+        SelectedStyleName = name;
+    }
+}
