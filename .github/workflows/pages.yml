@@ -33,6 +33,9 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Restore .NET workloads
+        run: dotnet workload restore creator/project/Zunepedia.Creator.csproj
+
       - name: Restore Creator
         run: dotnet restore creator/project/Zunepedia.Creator.csproj
 

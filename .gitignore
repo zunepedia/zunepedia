@@ -420,6 +420,7 @@ FodyWeavers.xsd
 # Zunepedia Creator published Blazor output
 /creator/_framework/
 /creator/css/
+/creator/images/
 /creator/lib/
 /creator/sample-data/
 /creator/*.br

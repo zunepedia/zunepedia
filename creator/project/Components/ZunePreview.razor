@@ -2,7 +2,7 @@
 @using Zunepedia.Creator.Services
 
 <span class="zune-preview zune-preview-@Type.ToString().ToLowerInvariant()">
-    @((MarkupString)ZuneSvgRenderer.Render(Type, Color, Scale))
+    @((MarkupString)ZuneSvgRenderer.Render(Type, Color, Scale, embedScreenLogo: false))
 </span>
 
 @code {

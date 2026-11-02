@@ -5,10 +5,17 @@ namespace Zunepedia.Creator.Services;
 
 public static partial class ZuneSvgRenderer
 {
+    private const string ScreenLogoPath = "images/zunepedia-screen-logo.svg";
     private const string ScreenLogoResourceName = "Zunepedia.Creator.Assets.zunepedia-screen-logo.svg";
     private static readonly Lazy<string> ScreenLogoDataUri = new(LoadScreenLogoDataUri);
 
-    private static string RenderScreenLogo(double screenX, double screenY, double screenWidth, double screenHeight, double heightRatio = 0.6)
+    private static string RenderScreenLogo(
+        double screenX,
+        double screenY,
+        double screenWidth,
+        double screenHeight,
+        double heightRatio = 0.6,
+        bool embedScreenLogo = true)
     {
         const double logoAspectRatio = 1050d / 1200d;
 
@@ -24,8 +31,11 @@ public static partial class ZuneSvgRenderer
 
         var x = screenX + ((screenWidth - logoWidth) / 2);
         var y = screenY + ((screenHeight - logoHeight) / 2);
+        var logoSource = embedScreenLogo
+            ? ScreenLogoDataUri.Value
+            : ScreenLogoPath;
 
-        return $"""<image href="{ScreenLogoDataUri.Value}" x="{Format(x)}" y="{Format(y)}" width="{Format(logoWidth)}" height="{Format(logoHeight)}" opacity="0.9" preserveAspectRatio="xMidYMid meet" />""";
+        return $"""<image href="{logoSource}" x="{Format(x)}" y="{Format(y)}" width="{Format(logoWidth)}" height="{Format(logoHeight)}" opacity="0.9" preserveAspectRatio="xMidYMid meet" />""";
     }
 
     private static string LoadScreenLogoDataUri()
