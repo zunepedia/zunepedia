@@ -1,5 +1,4 @@
 ﻿@page "/"
-@inject ZuneCatalog Catalog
 
 <PageTitle>Zunepedia - Creator</PageTitle>
 
@@ -27,59 +26,67 @@
                 @foreach (var style in AvailableStyles)
                 {
                     <button type="button"
-                            class="style-option @(style.Name == SelectedStyle.Name ? "selected" : null)"
-                            aria-pressed="@(style.Name == SelectedStyle.Name)"
+                            class="style-option @(style.Name == SelectedStyleName ? "selected" : null)"
+                            aria-pressed="@(style.Name == SelectedStyleName)"
                             @onclick="() => SelectStyle(style.Name)">
                         <span class="style-swatch" style="background-color: @style.Color" aria-hidden="true"></span>
                         <span>@style.Name</span>
                     </button>
                 }
+                <div class="custom-style-option @(IsCustomSelected ? "selected" : null)">
+                    <button type="button"
+                            class="custom-style-select"
+                            aria-pressed="@IsCustomSelected"
+                            @onclick="SelectCustomStyle">
+                        <span class="style-swatch" style="background-color: @CustomColor" aria-hidden="true"></span>
+                        <span>Custom</span>
+                    </button>
+                    @if (IsCustomSelected)
+                    {
+                        <input type="color"
+                               class="custom-color-picker"
+                               value="@CustomColor"
+                               aria-label="Custom colour for @SelectedDevice.Name"
+                               title="Choose a custom colour for @SelectedDevice.Name"
+                               @oninput="PreviewCustomColor"
+                               @onchange="CommitCustomColor" />
+                    }
+                </div>
             </div>
         </fieldset>
     </div>
 
     <div class="zune-card zune-display">
         <div class="zune-stage">
-            <ZunePreview Type="@SelectedType" Color="@SelectedStyle.Color" Scale="24" />
+            <ZunePreview Type="@SelectedType" Color="@SelectedColor" Scale="@ExportScale" />
         </div>
-        <a class="btn btn-primary zune-save position-relative" download="@FileName" href="@SvgDataUri">
-            <span>Save @SelectedStyle.Name @SelectedDevice.Name (@SelectedDevice.CodeName)</span>
-            <span class="zune-save-badge position-absolute top-100 start-50 translate-middle badge bg-dark rounded-pill">SVG</span>
-        </a>
+        <div class="zune-save-options">
+            @if (PngDataUri is not null)
+            {
+                <a class="btn btn-primary zune-save position-relative" download="@PngFileName" href="@PngDataUri">
+                    <span>Save @SelectedStyleName @SelectedDevice.Name (@SelectedDevice.CodeName)</span>
+                    <span class="zune-save-badge position-absolute top-100 start-50 translate-middle badge bg-dark rounded-pill">PNG</span>
+                </a>
+            }
+            else
+            {
+                <span class="btn btn-primary zune-save position-relative disabled"
+                      aria-disabled="true"
+                      aria-live="polite">
+                    <span>@(IsPngRendering
+                        ? $"Save {SelectedStyleName} {SelectedDevice.Name} ({SelectedDevice.CodeName})"
+                        : "PNG unavailable")</span>
+                    <span class="zune-save-badge position-absolute top-100 start-50 translate-middle badge bg-dark rounded-pill">PNG</span>
+                </span>
+            }
+            <a class="btn btn-primary zune-save position-relative" download="@SvgFileName" href="@SvgDataUri">
+                <span>Save @SelectedStyleName @SelectedDevice.Name (@SelectedDevice.CodeName)</span>
+                <span class="zune-save-badge position-absolute top-100 start-50 translate-middle badge bg-dark rounded-pill">SVG</span>
+            </a>
+        </div>
+        @if (PngError is not null)
+        {
+            <div class="zune-export-error" role="alert">@PngError</div>
+        }
     </div>
 </section>
-
-@code {
-    private ZuneType SelectedType { get; set; } = ZuneType.Keel;
-
-    private string SelectedStyleName { get; set; } = "Brown";
-
-    private ZuneDevice SelectedDevice =>
-        Catalog.Devices.Single(device => device.Type == SelectedType);
-
-    private IReadOnlyList<ZuneStyle> AvailableStyles =>
-        Catalog.GetStyles(SelectedType).ToList();
-
-    private ZuneStyle SelectedStyle =>
-        AvailableStyles.FirstOrDefault(style => style.Name == SelectedStyleName) ?? AvailableStyles[0];
-
-    private string SvgMarkup =>
-        ZuneSvgRenderer.Render(SelectedType, SelectedStyle.Color, scale: 24);
-
-    private string SvgDataUri =>
-        $"data:image/svg+xml;charset=utf-8,{Uri.EscapeDataString(SvgMarkup)}";
-
-    private string FileName =>
-        $"{SelectedStyle.Name}-{SelectedDevice.CodeName}.svg".Replace(' ', '-').ToLowerInvariant();
-
-    private void SelectDevice(ZuneType type)
-    {
-        SelectedType = type;
-        SelectedStyleName = AvailableStyles[0].Name;
-    }
-
-    private void SelectStyle(string name)
-    {
-        SelectedStyleName = name;
-    }
-}

@@ -113,18 +113,81 @@ h1:focus {
     padding-block: 0.4rem;
 }
 
+.custom-style-option {
+    display: grid;
+    align-items: center;
+    width: 100%;
+    padding: 0.4rem 0.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.custom-style-select {
+    display: grid;
+    grid-template-columns: 1.45rem 1fr;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    color: #f6f0e8;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+}
+
 .device-option:hover,
 .device-option:focus-visible,
 .style-option:hover,
-.style-option:focus-visible {
+.style-option:focus-visible,
+.custom-style-option:hover,
+.custom-style-option:focus-within {
     border-color: rgba(255, 127, 56, 0.8);
     outline: none;
 }
 
 .device-option.selected,
-.style-option.selected {
+.style-option.selected,
+.custom-style-option.selected {
     border-color: #ff7f38;
     background: rgba(255, 127, 56, 0.18);
+}
+
+.custom-style-select:focus-visible {
+    outline: none;
+}
+
+.custom-color-picker {
+    width: 100%;
+    height: 2rem;
+    margin-top: 0.4rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 0.45rem;
+    background: rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.custom-color-picker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.custom-color-picker::-webkit-color-swatch {
+    border: 0;
+    border-radius: 0.35rem;
+}
+
+.custom-color-picker::-moz-color-swatch {
+    border: 0;
+    border-radius: 0.35rem;
+}
+
+.custom-color-picker:focus-visible {
+    border-color: #ff7f38;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(145, 67, 24, 0.55);
 }
 
 .device-thumb {
@@ -220,6 +283,14 @@ h1:focus {
     font-weight: 700;
 }
 
+.zune-save-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem 0.75rem;
+    width: 100%;
+}
+
 .zune-save:hover,
 .zune-save:focus-visible {
     border-color: #ff9a60;
@@ -227,8 +298,20 @@ h1:focus {
     color: #1a1110;
 }
 
+.zune-save.disabled,
+.zune-save:disabled {
+    border-color: #ff7f38;
+    background-color: #ff7f38;
+    color: #1a1110;
+}
+
 .zune-save-badge {
     margin-top: 0.2rem;
+}
+
+.zune-export-error {
+    color: #ffb59f;
+    text-align: center;
 }
 
 @media (max-width: 48rem) {

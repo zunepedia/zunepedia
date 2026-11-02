@@ -6,15 +6,22 @@
     <RootNamespace>Zunepedia.Creator</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <WasmBuildNative>true</WasmBuildNative>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.11" PrivateAssets="all" />
+    <PackageReference Include="SkiaSharp" Version="4.154.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="4.154.0" />
+    <PackageReference Include="Svg.Skia" Version="5.2.3" />
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Assets\zunepedia-screen-logo.svg" />
+    <EmbeddedResource Include="wwwroot\images\zunepedia-screen-logo.svg"
+                      LogicalName="Zunepedia.Creator.Assets.zunepedia-screen-logo.svg" />
   </ItemGroup>
 </Project>
